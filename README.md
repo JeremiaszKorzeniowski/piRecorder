@@ -26,7 +26,13 @@ ale aplikacja obecnie nie ładuje go automatycznie.
 
 Domyślne E2: CLK=16, DT=12, SW=26. Program testowy używa tych samych pinów
 co panel. Nie uruchamiaj obu programów jednocześnie. Starsze `recorder.py`
-i `recorder_lcd.py` są alternatywnymi programami, a nie modułami usługi.
+i `recorder_lcd.py` są zarchiwizowane w `.old/` i nie są używane przez usługę.
+Ich kod pozostaje bez zmian; przy ręcznym uruchamianiu wymagają katalogu głównego
+projektu w `PYTHONPATH`, żeby znaleźć `config.py`.
+
+Katalog `.test/` jest zarezerwowany na przyszłe testy. Na razie zawiera tylko
+`.gitkeep`, ponieważ Git nie przechowuje pustych katalogów. Aktualny ręczny test
+sprzętu `test_panel.py` pozostaje w katalogu głównym.
 
 ## Usługa na istniejącym RPi
 
