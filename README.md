@@ -62,3 +62,17 @@ aktualizuje przez fast-forward i restartuje `recorder.service`.
 Nie ma timera ani aktualizacji w tle. Skrypt nie wykrywa nagrywania, nie instaluje
 zależności, nie wdraża szablonu usługi i nie wycofuje automatycznie błędnej wersji.
 Nie naciskaj REC podczas aktualizacji. Klucz SSH z hasłem może wymagać jego podania.
+
+## Wersja programu
+
+Bieżąca wersja wydania znajduje się w pliku `VERSION`. Po ponownym uruchomieniu
+`scripts/install-service.sh` dostępna jest komenda:
+
+```bash
+xdver
+```
+
+Pokazuje wersję wydania, commit i jego datę, gałąź, lokalne zmiany, zgodność
+z ostatnio pobranym `origin/main` oraz stan `recorder.service`. `xdver` działa
+bez połączenia z siecią, więc nie sprawdza, czy na GitHubie pojawił się nowszy
+commit. Do pobrania aktualnych informacji i aktualizacji nadal służy `xd`.

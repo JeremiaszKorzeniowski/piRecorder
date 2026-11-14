@@ -5,6 +5,11 @@ main() {
 
 script_path="$(readlink -f -- "${BASH_SOURCE[0]}")"
 project_dir="$(dirname -- "$(dirname -- "$script_path")")"
+
+if [[ "$(basename -- "$0")" == "xdver" ]]; then
+    exec bash "$project_dir/scripts/version.sh" "$@"
+fi
+
 cd "$project_dir"
 
 if [[ "$(git branch --show-current)" != "main" ]]; then

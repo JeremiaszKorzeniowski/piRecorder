@@ -26,5 +26,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable recorder.service
 mkdir -p "$HOME/.local/bin"
 ln -sfn "$project_dir/scripts/update.sh" "$HOME/.local/bin/xd"
+ln -sfn "$project_dir/scripts/update.sh" "$HOME/.local/bin/xdver"
 echo "Usluga zainstalowana. Po zakonczeniu nagrywania: sudo systemctl restart recorder.service"
 echo "Aktualizacja: $HOME/.local/bin/xd (dodaj ~/.local/bin do PATH, jesli potrzeba)."
+echo "Wersja: $HOME/.local/bin/xdver"
