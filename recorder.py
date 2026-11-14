@@ -1,3 +1,5 @@
+import config
+
 from gpiozero import Button
 from datetime import datetime
 from pathlib import Path
@@ -5,13 +7,14 @@ from queue import Queue, Empty
 import subprocess
 import signal
 
-folder = Path.home() / "recordings"
+folder = config.RECORDINGS_DIR
+folder.mkdir(parents=True, exist_ok=True)
 events = Queue()
 process = None
 filename = None
 
-rec = Button(17, pull_up=True, bounce_time=0.1)
-stop = Button(27, pull_up=True, bounce_time=0.1)
+rec = Button(config.REC_PIN, pull_up=True, bounce_time=0.1)
+stop = Button(config.STOP_PIN, pull_up=True, bounce_time=0.1)
 
 rec.when_pressed = lambda: events.put("rec")
 stop.when_pressed = lambda: events.put("stop")
@@ -49,7 +52,7 @@ try:
             )
             process = subprocess.Popen([
                 "arecord",
-                "-D", "hw:CARD=UMC1820,DEV=0",
+                "-D", config.CAPTURE_DEVICE,
                 "-t", "wav",
                 "-f", "S32_LE",
                 "-r", "48000",

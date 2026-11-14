@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cd /home/jk/recorder
+main() {
+
+script_path="$(readlink -f -- "${BASH_SOURCE[0]}")"
+project_dir="$(dirname -- "$(dirname -- "$script_path")")"
+cd "$project_dir"
+
+if [[ "$(git branch --show-current)" != "main" ]]; then
+    echo "Aktualizacja wymaga galezi main."
+    exit 1
+fi
 
 if [[ -n "$(git status --porcelain)" ]]; then
     echo "Masz lokalne zmiany. Zapisz je w Git przed aktualizacją."
@@ -27,3 +36,6 @@ read -r -p "Zakończ nagrywanie i odsłuch. Aktualizować teraz? [t/N] " answer
 git merge --ff-only origin/main
 sudo systemctl restart recorder.service
 systemctl status recorder.service --no-pager
+
+}
+main "$@"

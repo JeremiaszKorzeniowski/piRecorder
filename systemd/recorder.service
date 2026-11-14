@@ -4,9 +4,9 @@ After=sound.target
 
 [Service]
 Type=simple
-User=jk
-WorkingDirectory=/home/jk/recorder
-ExecStart=/home/jk/recorder/.venv/bin/python -u /home/jk/recorder/recorder_main.py
+User=@USER@
+WorkingDirectory=@PROJECT_DIR@
+ExecStart=@PROJECT_DIR@/.venv/bin/python -u @PROJECT_DIR@/recorder_main.py
 Restart=on-failure
 RestartSec=5
 KillSignal=SIGTERM

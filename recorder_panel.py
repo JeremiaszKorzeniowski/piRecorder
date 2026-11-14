@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """piRecorder: LCD 20x4, REC/STOP, dwa enkodery, trzy LED.
 
-REC=17 STOP=27; E1 CLK/DT/SW=5/6/13; E2=16/20/26 (BCM).
+REC=17 STOP=27; E1 CLK/DT/SW=5/6/13; E2=16/12/26 (BCM).
 LED R/G/Y=22/23/24; PCF8574 0x27 na I2C1. 
 E1 wybiera WAV, klik odtwarza/zatrzymuje. E2 reguluje glosnosc
 odsluchu, klik wybiera WSZYSTKIE lub pare kanalow (przy zatrzymaniu).
@@ -24,14 +24,14 @@ import struct
 import tempfile
 import wave
 
+import config
+
 from gpiozero import Button, LED, RotaryEncoder
 from RPLCD.i2c import CharLCD
 
-FOLDER = Path.home() / 'recordings'
-CAPTURE = 'hw:CARD=UMC1820,DEV=0'
-OUTPUT = 'alsa/plughw:CARD=UMC1820,DEV=0'
-E1_DIRECTION = 1  # Zmien na -1, jesli kierunek jest odwrotny.
-E2_DIRECTION = 1
+FOLDER = config.RECORDINGS_DIR
+CAPTURE = config.CAPTURE_DEVICE
+OUTPUT = config.PLAYBACK_DEVICE
 
 
 def valid_recording(path):
@@ -110,19 +110,19 @@ class Recorder:
         self.ipc_path = str(Path(self.temp) / 'mpv.sock')
         self.volume_pending = False
         self.leds = {name: stack.enter_context(LED(pin, initial_value=False))
-                     for name, pin in [('R', 22), ('G', 23), ('Y', 24)]}
-        self.lcd = CharLCD(i2c_expander='PCF8574', address=0x27,
-                           port=1, cols=20, rows=4, backlight_enabled=True)
+                     for name, pin in config.LED_PINS.items()}
+        self.lcd = CharLCD(**config.LCD_OPTIONS)
         stack.callback(self.lcd.close, clear=False)
         self.lcd.clear()
         self.buttons = []
-        for action, pin in [('rec', 17), ('stop', 27), ('play', 13), ('pair', 26)]:
+        for action, pin in [('rec', config.REC_PIN), ('stop', config.STOP_PIN),
+                            ('play', config.E1_PINS[2]), ('pair', config.E2_PINS[2])]:
             b = stack.enter_context(Button(pin, pull_up=True, bounce_time=0.1))
             b.when_pressed = partial(self.enqueue, action, 0)
             self.buttons.append(b)
         self.encoders = []
-        for action, clk, dt, direction in [('select', 5, 6, E1_DIRECTION),
-                                           ('volume', 16, 12, E2_DIRECTION)]:
+        for action, clk, dt, direction in [('select', *config.E1_PINS[:2], config.E1_DIRECTION),
+                                           ('volume', *config.E2_PINS[:2], config.E2_DIRECTION)]:
             enc = stack.enter_context(RotaryEncoder(clk, dt, max_steps=0))
             enc.when_rotated_clockwise = partial(self.enqueue, action, direction)
             enc.when_rotated_counter_clockwise = partial(self.enqueue, action, -direction)
@@ -377,7 +377,8 @@ def main():
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, terminate)
     with ExitStack() as stack:
-        lock = stack.enter_context((Path.home() / 'recorder' / '.panel.lock').open('w'))
+        config.LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+        lock = stack.enter_context(config.LOCK_FILE.open('w'))
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:

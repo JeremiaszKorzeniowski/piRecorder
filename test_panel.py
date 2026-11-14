@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Test panelu piRecorder. Nie nagrywa i nie steruje Spotify.
 
-Numery BCM: REC=17, STOP=27; E1=5/6/13; E2=16/20/21;
+Numery BCM: REC=17, STOP=27; E1=5/6/13; E2=16/12/26;
 LED R/G/Y=22/23/24; LCD PCF8574 0x27, I2C 1, 20x4.
 Uruchamiaj bez drugiego programu korzystajacego z tych GPIO/LCD.
 """
@@ -9,6 +9,8 @@ from contextlib import ExitStack
 from queue import Queue, Empty
 from time import monotonic, sleep
 import signal
+
+import config
 
 from gpiozero import Button, LED, RotaryEncoder
 from RPLCD.i2c import CharLCD
@@ -44,10 +46,9 @@ def main():
     with ExitStack() as stack:
         try:
             leds = {}
-            for name, pin in [('R', 22), ('G', 23), ('Y', 24)]:
+            for name, pin in config.LED_PINS.items():
                 leds[name] = stack.enter_context(LED(pin, initial_value=False))
-            lcd = CharLCD(i2c_expander='PCF8574', address=0x27,
-                          port=1, cols=20, rows=4, backlight_enabled=True)
+            lcd = CharLCD(**config.LCD_OPTIONS)
             lcd.clear()
 
             # Test kazdej diody osobno; widoczna nazwa pozwala sprawdzic przewody.
@@ -59,13 +60,14 @@ def main():
                 leds[color].off()
 
             buttons = []
-            for name, pin in [('REC', 17), ('STOP', 27), ('E1 KLIK', 13), ('E2 KLIK', 21)]:
+            for name, pin in [('REC', config.REC_PIN), ('STOP', config.STOP_PIN),
+                              ('E1 KLIK', config.E1_PINS[2]), ('E2 KLIK', config.E2_PINS[2])]:
                 button = stack.enter_context(Button(pin, pull_up=True, bounce_time=0.08))
                 buttons.append(button)
                 button.when_pressed = button_handler(name)
 
             encoders = []
-            for number, clk, dt in [(1, 5, 6), (2, 16, 20)]:
+            for number, clk, dt in [(1, *config.E1_PINS[:2]), (2, *config.E2_PINS[:2])]:
                 encoder = stack.enter_context(RotaryEncoder(clk, dt, max_steps=0))
                 encoders.append(encoder)
                 encoder.when_rotated_clockwise = rotation_handler(number, 1, encoder)
