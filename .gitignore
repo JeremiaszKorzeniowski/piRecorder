@@ -15,7 +15,7 @@ __pycache__/
 *.log
 
 # Nagrania
-nagrania/
+recordings/
 *.wav
 *.flac
 *.mp3
