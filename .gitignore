@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Kopie zapasowe
+*.bak
+*.bak-*
+*~
+
+# Pliki robocze
+.lgd-nfy*
+.panel.lock
+*.log
+
+# Nagrania
+nagrania/
+*.wav
+*.flac
+*.mp3
+
+# Lokalna konfiguracja i sekrety
+.env
+.env.*
+!.env.example
