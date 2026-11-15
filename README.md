@@ -52,7 +52,7 @@ Uruchamiaj instalator bez sudo. Używa aktualnego użytkownika i katalogu projek
 `systemd/recorder.service` jest szablonem — nie kopiuj go bezpośrednio do `/etc`.
 Instalator ustawia autostart oraz dowiązanie `~/.local/bin/xd`, ale nie restartuje
 pracującego programu. W razie zmiany szablonu uruchom instalator ponownie.
-Dotychczasowa usługa na `/home/jk/recorder` nadal działa bez reinstalacji.
+Dotychczasowa usługa nadal działa bez reinstalacji.
 
 ## Ręczna aktualizacja
 
